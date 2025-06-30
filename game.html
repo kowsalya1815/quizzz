@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Creative Quiz Game</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: white;
+      padding: 20px;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .quiz-container {
+      max-width: 900px;
+      margin: auto;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+    }
+
+    .question-card {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 15px;
+      transition: transform 0.3s ease;
+    }
+
+    .question-card:hover {
+      transform: scale(1.01);
+    }
+
+    .question-card h3 {
+      margin: 0 0 10px;
+    }
+
+    label {
+      display: block;
+      margin: 5px 0;
+      background: rgba(255,255,255,0.2);
+      padding: 8px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    label:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .submit-btn {
+      display: block;
+      margin: 30px auto 10px;
+      padding: 15px 30px;
+      background-color: #00c9a7;
+      color: white;
+      border: none;
+      font-size: 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .submit-btn:hover {
+      background-color: #00a187;
+    }
+
+    #score-section {
+      display: none;
+      margin-top: 30px;
+      text-align: center;
+      font-size: 24px;
+      background: rgba(255,255,255,0.2);
+      padding: 20px;
+      border-radius: 15px;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: #ffffff40;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: #00ffd0;
+      transition: width 0.4s ease;
+    }
+
+    .input-name {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .input-name input {
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+      width: 50%;
+      max-width: 300px;
+      text-align: center;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(30px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧠 Creative Quiz Challenge</h1>
+
+  <div class="quiz-container">
+    <form id="quizForm">
+      <div class="input-name">
+        <input type="text" id="userName" placeholder="Enter your name" required />
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+
+      <!-- Questions will be dynamically inserted here -->
+    </form>
+
+    <div id="score-section"></div>
+  </div>
+
+  <script>
+    const questions = [
+      { q: "What is the capital of France?", a: "Paris", options: ["London", "Paris", "Berlin"] },
+      { q: "Who invented the light bulb?", a: "Thomas Edison", options: ["Newton", "Einstein", "Thomas Edison"] },
+      { q: "What is H2O?", a: "Water", options: ["Oxygen", "Water", "Carbon"] },
+      { q: "10 × 10 = ?", a: "100", options: ["10", "100", "1000"] },
+      { q: "Planet closest to sun?", a: "Mercury", options: ["Venus", "Earth", "Mercury"] },
+      { q: "Romeo & Juliet author?", a: "William Shakespeare", options: ["Dickens", "Shakespeare", "Tolstoy"] },
+      { q: "Gas plants absorb?", a: "Carbon Dioxide", options: ["Oxygen", "Hydrogen", "Carbon Dioxide"] },
+      { q: "√64 = ?", a: "8", options: ["6", "7", "8"] },
+      { q: "Largest mammal?", a: "Blue Whale", options: ["Elephant", "Whale Shark", "Blue Whale"] },
+      { q: "Color of chlorophyll?", a: "Green", options: ["Red", "Green", "Blue"] },
+      { q: "National flower of India?", a: "Lotus", options: ["Lily", "Rose", "Lotus"] },
+      { q: "Instrument with pedals?", a: "Piano", options: ["Flute", "Guitar", "Piano"] },
+      { q: "Smallest prime number?", a: "2", options: ["1", "2", "3"] },
+      { q: "Boiling point of water?", a: "100°C", options: ["90°C", "100°C", "110°C"] },
+      { q: "Sahara Desert is in?", a: "Africa", options: ["Asia", "Africa", "Australia"] },
+      { q: "Mona Lisa painter?", a: "Leonardo da Vinci", options: ["Van Gogh", "Picasso", "Leonardo da Vinci"] },
+      { q: "Language of Brazil?", a: "Portuguese", options: ["Spanish", "Portuguese", "French"] },
+      { q: "Spider has how many legs?", a: "8", options: ["6", "8", "10"] },
+      { q: "Currency of Japan?", a: "Yen", options: ["Won", "Dollar", "Yen"] },
+      { q: "Largest human organ?", a: "Skin", options: ["Brain", "Liver", "Skin"] }
+    ];
+
+    const form = document.getElementById('quizForm');
+    const progressFill = document.getElementById('progressFill');
+
+    questions.forEach((q, i) => {
+      const card = document.createElement('div');
+      card.className = 'question-card';
+      card.innerHTML = `<h3>${i + 1}. ${q.q}</h3>` +
+        q.options.map(opt =>
+          `<label><input type="radio" name="q${i}" value="${opt}"> ${opt}</label>`).join('');
+      form.insertBefore(card, form.lastElementChild);
+    });
+
+    form.addEventListener('change', () => {
+      const total = questions.length;
+      let answered = 0;
+      for (let i = 0; i < total; i++) {
+        if (document.querySelector(`input[name="q${i}"]:checked`)) answered++;
+      }
+      const percentage = (answered / total) * 100;
+      progressFill.style.width = `${percentage}%`;
+    });
+
+    const submitBtn = document.createElement('button');
+    submitBtn.type = 'submit';
+    submitBtn.className = 'submit-btn';
+    submitBtn.textContent = 'Submit Quiz';
+    form.appendChild(submitBtn);
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const userName = document.getElementById("userName").value.trim();
+      if (!userName) return alert("Please enter your name!");
+
+      let score = 0;
+      questions.forEach((q, i) => {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected && selected.value === q.a) {
+          score++;
+        }
+      });
+
+      document.getElementById("score-section").style.display = 'block';
+      document.getElementById("score-section").innerHTML = `
+        🎉 <strong>${userName}</strong>, you scored <strong>${score}</strong> out of <strong>${questions.length}</strong>!
+      `;
+
+      // Optional score submission
+      fetch("https://example.com/api/submit-score", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: userName, score: score })
+      }).catch(console.error);
+    });
+  </script>
+</body>
+</html>
